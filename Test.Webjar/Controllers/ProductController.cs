@@ -2,6 +2,7 @@
 using Application.Product.Command.AddProduct;
 using Application.Product.Command.AddProductAdditive;
 using Application.Product.Command.AddProductCategory;
+using Application.Product.Command.AddProductPrice;
 using Application.Product.Command.AddProductPriceOption;
 using Application.Product.Query.GetProductAdditive;
 using Application.Product.Query.GetProductCategory;
@@ -12,6 +13,7 @@ using Services;
 using Services.Product.Shared.Product;
 using Services.Product.Shared.ProductAdditive.Vm;
 using Services.Product.Shared.ProductCategory;
+using Services.Product.Shared.ProductPrice;
 using Services.Product.Shared.ProductPriceOption;
 
 namespace Test.Webjar.Controllers
@@ -60,9 +62,9 @@ namespace Test.Webjar.Controllers
         }
 
         [HttpGet("[action]")]
-        public async Task<ServiceResult<List<ProductAddivesVm>>> GetProductAdditive(string? title ,string? categoryTitle)
+        public async Task<ServiceResult<List<ProductAddivesVm>>> GetProductAdditive(string? title, string? categoryTitle)
         {
-            var result = await _mediator.Send(new GetProductAdditiveQuery(title,categoryTitle));
+            var result = await _mediator.Send(new GetProductAdditiveQuery(title, categoryTitle));
             return result;
         }
         #endregion
@@ -72,7 +74,7 @@ namespace Test.Webjar.Controllers
         public async Task<ServiceResult> AddProductPriceOption([FromBody] PriceOptionModel Model)
         {
             var result = await _mediator.Send(new AddProductPriceOptionCommand(Model));
-            return result;  
+            return result;
         }
         #endregion
 
@@ -85,7 +87,13 @@ namespace Test.Webjar.Controllers
         }
         #endregion
 
-        #region ProductPriceHistory
+        #region ProductPrice
+        [HttpPost("[action]")]
+        public async Task<ServiceResult> AddProductPrice([FromBody] ProductPriceModel model)
+        {
+            var result = await _mediator.Send(new AddProductPriceCommand(model));
+            return result;
+        }
         #endregion
 
     }

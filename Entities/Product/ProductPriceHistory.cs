@@ -16,7 +16,16 @@ namespace Entities.Product
         public DateTime? DiscountPriceExpireAt { get; private set; }
         public int ProductId { get; private set; }
         public Product Product { get; private set; }
-        public ICollection<ProductPriceHistoryToOptionValues> ProductPriceHistoryToOptionValues { get; private set; }
+        public ICollection<ProductPriceHistoryToOptionValues> ProductPriceHistoryToOptionValues { get; set; }
+
+        public ProductPriceHistory(decimal price, int inventory, decimal? discountPrice, DateTime? discountPriceExpireAt, int productId)
+        {
+            Price = price;
+            Inventory = inventory;
+            DiscountPrice = discountPrice;
+            DiscountPriceExpireAt = discountPriceExpireAt;
+            ProductId = productId;
+        }
     }
     internal class ProductPriceHistoryConfiguration : IEntityTypeConfiguration<ProductPriceHistory>
     {

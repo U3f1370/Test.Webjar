@@ -14,6 +14,11 @@ namespace Entities.Product
         public ProductPriceOptionValue ProductPriceOptionValue { get; private set; }
         public int ProductPriceHistoryId { get; private set; }
         public ProductPriceHistory ProductPriceHistory { get; private set; }
+
+        public ProductPriceHistoryToOptionValues(int productPriceOptionValueId)
+        {
+            ProductPriceOptionValueId = productPriceOptionValueId;
+        }
     }
     internal class ProductPriceHistoryToOptionValuesConfiguration : IEntityTypeConfiguration<ProductPriceHistoryToOptionValues>
     {

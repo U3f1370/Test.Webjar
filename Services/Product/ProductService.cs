@@ -7,6 +7,7 @@ using Services.File;
 using Services.Product.Shared.Product;
 using Services.Product.Shared.ProductAdditive.Vm;
 using Services.Product.Shared.ProductCategory;
+using Services.Product.Shared.ProductPrice;
 using Services.Product.Shared.ProductPriceOption;
 using System.Reflection.Metadata.Ecma335;
 using Volo.Abp.DependencyInjection;
@@ -24,6 +25,7 @@ namespace Services.Product
         private readonly DbSet<ProductAdditive> _productAdditive;
         private readonly DbSet<ProductPriceOption> _productPriceOption;
         private readonly DbSet<ProductPriceOptionValue> _optionValues;
+        private readonly DbSet<ProductPriceHistory> _productPriceHistories;
 
         public ProductService(IUnitOfWork unitOfWork, IConfiguration configuration, IFileService fileService)
         {
@@ -33,6 +35,7 @@ namespace Services.Product
             _productAdditive = _uow.Set<ProductAdditive>();
             _productPriceOption = _uow.Set<ProductPriceOption>();
             _optionValues = _uow.Set<ProductPriceOptionValue>();
+            _productPriceHistories = _uow.Set<ProductPriceHistory>();
             _configuration = configuration;
             _fileService = fileService;
         }
@@ -179,7 +182,31 @@ namespace Services.Product
         }
         #endregion
 
-        #region ProductPriceHistory
+        #region ProductPrice
+        public async Task<ServiceResult> CreateProductPrice(ProductPriceModel model,CancellationToken cancellationToken)
+        {
+            var productPrice = new ProductPriceHistory(model.Price, model.Inventory,
+                model.DiscountPrice, model.DiscountPriceExpireAt, model.ProductId);
+
+            if (model.OptionValues != null && model.OptionValues.Any())
+            {
+                var priceToValues = new List<ProductPriceHistoryToOptionValues>();
+                
+                foreach(var optionValue in model.OptionValues)
+                {
+                    priceToValues.Add(new ProductPriceHistoryToOptionValues(optionValue.OptionValueId));
+                }
+                productPrice.ProductPriceHistoryToOptionValues = priceToValues;
+            }
+
+            await _productPriceHistories.AddAsync(productPrice);
+
+            var result = await _uow.SaveChangesAsync();
+            if (result > 0)
+                return new ServiceResult(true, ApiResultStatusCode.Success);
+
+            return new ServiceResult(true, ApiResultStatusCode.ServerError);
+        }
         #endregion
     }
 }

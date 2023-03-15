@@ -1,6 +1,7 @@
 ﻿using Services.Product.Shared.Product;
 using Services.Product.Shared.ProductAdditive.Vm;
 using Services.Product.Shared.ProductCategory;
+using Services.Product.Shared.ProductPrice;
 using Services.Product.Shared.ProductPriceOption;
 
 namespace Services.Product
@@ -29,7 +30,8 @@ namespace Services.Product
         Task<ServiceResult> CreatePriceOptionValue(PriceOptionValueModel model, CancellationToken cancellationToken);
         #endregion
 
-        #region ProductPriceHistory
+        #region ProductPrice
+        Task<ServiceResult> CreateProductPrice(ProductPriceModel model, CancellationToken cancellationToken);
         #endregion
     }
 }

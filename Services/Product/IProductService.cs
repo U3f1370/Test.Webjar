@@ -1,6 +1,7 @@
 ﻿using Services.Product.Shared.Product;
 using Services.Product.Shared.ProductAdditive.Vm;
 using Services.Product.Shared.ProductCategory;
+using Services.Product.Shared.ProductPriceOption;
 
 namespace Services.Product
 {
@@ -18,6 +19,10 @@ namespace Services.Product
         #region ProductAdditive
         Task<ServiceResult<List<ProductAddivesVm>>> GetProductAdditive(string? title, string? catTitle, CancellationToken cancellationToken);
         Task<ServiceResult> CreateProductAdditive(int categoryId, string title, decimal price, CancellationToken cancellationToken);
+        #endregion
+
+        #region ProductPriceOption
+        Task<ServiceResult> CreateProductPriceOption(PriceOptionModel model, CancellationToken cancellationToken);
         #endregion
     }
 }

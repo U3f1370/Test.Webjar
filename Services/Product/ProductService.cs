@@ -7,6 +7,7 @@ using Services.File;
 using Services.Product.Shared.Product;
 using Services.Product.Shared.ProductAdditive.Vm;
 using Services.Product.Shared.ProductCategory;
+using Services.Product.Shared.ProductPriceOption;
 using System.Reflection.Metadata.Ecma335;
 using Volo.Abp.DependencyInjection;
 
@@ -21,6 +22,7 @@ namespace Services.Product
         private readonly DbSet<Entities.Product.Product> _product;
         private readonly DbSet<ProductCategory> _productCategory;
         private readonly DbSet<ProductAdditive> _productAdditive;
+        private readonly DbSet<ProductPriceOption> _productPriceOption;
 
         public ProductService(IUnitOfWork unitOfWork, IConfiguration configuration, IFileService fileService)
         {
@@ -28,6 +30,7 @@ namespace Services.Product
             _product = _uow.Set<Entities.Product.Product>();
             _productCategory = _uow.Set<ProductCategory>();
             _productAdditive = _uow.Set<ProductAdditive>();
+            _productPriceOption = _uow.Set<ProductPriceOption>();
             _configuration = configuration;
             _fileService = fileService;
         }
@@ -131,6 +134,31 @@ namespace Services.Product
                     LateUpdateDm = a.LastUpdateDm,
                 }).ToListAsync();
             return new ServiceResult<List<ProductAddivesVm>>(true,ApiResultStatusCode.Success,additives);
+        }
+        #endregion
+
+        #region ProductPriceOption
+        public async Task<ServiceResult> CreateProductPriceOption(PriceOptionModel model,CancellationToken cancellationToken)
+        {
+            var existCategory = await _productCategory.FirstOrDefaultAsync(c => c.Id.Equals(model.CatId));
+            if (existCategory == null)
+                return new ServiceResult(true, ApiResultStatusCode.BadRequest, "This Category is not exist");
+
+            var exist = await _productPriceOption
+                .Where(a => a.ProductCategoryId.Equals(model.CatId) && a.Name == model.Name)
+                .FirstOrDefaultAsync();
+            if (exist is not null)
+                return new ServiceResult(true, ApiResultStatusCode.BadRequest, "This Option has already been created");
+
+            var priceOption = new ProductPriceOption(model.CatId, model.Name);
+
+            await _productPriceOption.AddAsync(priceOption);
+
+            var result = await _uow.SaveChangesAsync();
+            if (result > 0)
+                return new ServiceResult(true, ApiResultStatusCode.Success);
+
+            return new ServiceResult(true, ApiResultStatusCode.ServerError);
         }
         #endregion
     }

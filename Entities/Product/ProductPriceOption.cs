@@ -5,10 +5,16 @@ namespace Entities.Product
 {
     public class ProductPriceOption:BaseEntity,IEntityApp
     {
-        public int? ProductCategoryId { get;private set; }
+        public int ProductCategoryId { get;private set; }
         public ProductCategory ProductCategory { get; private set; }
         public string Name { get; private set; }
         public ICollection<ProductPriceOptionValue> OptionValues { get; private set; }
+
+        public ProductPriceOption(int productCategoryId, string name)
+        {
+            ProductCategoryId = productCategoryId;
+            Name = name;
+        }
     }
     internal class ProductPriceOptionConfiguration : IEntityTypeConfiguration<ProductPriceOption>
     {

@@ -1,6 +1,7 @@
 ﻿using Application.Product.Command.AddProduct;
 using Application.Product.Command.AddProductAdditive;
 using Application.Product.Command.AddProductCategory;
+using Application.Product.Command.AddProductPriceOption;
 using Application.Product.Query.GetProductAdditive;
 using Application.Product.Query.GetProductCategory;
 using Appliction.Product.Shared.Model.ProductAdditive;
@@ -10,6 +11,7 @@ using Services;
 using Services.Product.Shared.Product;
 using Services.Product.Shared.ProductAdditive.Vm;
 using Services.Product.Shared.ProductCategory;
+using Services.Product.Shared.ProductPriceOption;
 
 namespace Test.Webjar.Controllers
 {
@@ -68,5 +70,16 @@ namespace Test.Webjar.Controllers
             return result;
         }
         #endregion
+
+        #region ProductPriceOption
+        [HttpPost("[action]")]
+        public async Task<ServiceResult> AddProductPriceOption([FromBody] PriceOptionModel Model)
+        {
+            var result = await _mediator.Send(new AddProductPriceOptionCommand(Model));
+            return result;  
+        }
+        #endregion
+
+
     }
 }

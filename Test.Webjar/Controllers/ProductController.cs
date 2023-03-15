@@ -1,4 +1,5 @@
-﻿using Application.Product.Command.AddProduct;
+﻿using Application.Product.Command.AddPriceOptionValue;
+using Application.Product.Command.AddProduct;
 using Application.Product.Command.AddProductAdditive;
 using Application.Product.Command.AddProductCategory;
 using Application.Product.Command.AddProductPriceOption;
@@ -79,5 +80,18 @@ namespace Test.Webjar.Controllers
             return result;  
         }
         #endregion
+
+        #region ProductPriceOptionValue
+        [HttpPost("[action]")]
+        public async Task<ServiceResult> AddProductPriceOptionValue([FromBody] PriceOptionValueModel Model)
+        {
+            var result = await _mediator.Send(new AddPriceOptionValueCommand(Model));
+            return result;
+        }
+        #endregion
+
+        #region ProductPriceHistory
+        #endregion
+
     }
 }

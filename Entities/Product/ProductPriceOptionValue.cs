@@ -16,6 +16,12 @@ namespace Entities.Product
         public int ProductPriceOptionId { get; private set; }
         public ProductPriceOption ProductPriceOption { get; private set; }
         public ICollection<ProductPriceHistoryToOptionValues> ProductPriceHistoryToOptionValues { get;private set; }
+
+        public ProductPriceOptionValue(string value, int productPriceOptionId)
+        {
+            Value = value;
+            ProductPriceOptionId = productPriceOptionId;
+        }
     }
     internal class ProductPriceOptionValueConfiguration : IEntityTypeConfiguration<ProductPriceOptionValue>
     {

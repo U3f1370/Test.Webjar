@@ -23,6 +23,7 @@ namespace Services.Product
         private readonly DbSet<ProductCategory> _productCategory;
         private readonly DbSet<ProductAdditive> _productAdditive;
         private readonly DbSet<ProductPriceOption> _productPriceOption;
+        private readonly DbSet<ProductPriceOptionValue> _optionValues;
 
         public ProductService(IUnitOfWork unitOfWork, IConfiguration configuration, IFileService fileService)
         {
@@ -31,6 +32,7 @@ namespace Services.Product
             _productCategory = _uow.Set<ProductCategory>();
             _productAdditive = _uow.Set<ProductAdditive>();
             _productPriceOption = _uow.Set<ProductPriceOption>();
+            _optionValues = _uow.Set<ProductPriceOptionValue>();
             _configuration = configuration;
             _fileService = fileService;
         }
@@ -160,6 +162,24 @@ namespace Services.Product
 
             return new ServiceResult(true, ApiResultStatusCode.ServerError);
         }
+        #endregion
+
+        #region ProductPriceOptionValue
+        public async Task<ServiceResult> CreatePriceOptionValue(PriceOptionValueModel model,CancellationToken cancellationToken)
+        {
+            // we should check option Id is Exists.Also we must check value so that it is not repeated
+            var value = new ProductPriceOptionValue(model.Value, model.PriceOptionId);
+            await _optionValues.AddAsync(value);
+
+            var result = await _uow.SaveChangesAsync();
+            if (result > 0)
+                return new ServiceResult(true, ApiResultStatusCode.Success);
+
+            return new ServiceResult(true, ApiResultStatusCode.ServerError);
+        }
+        #endregion
+
+        #region ProductPriceHistory
         #endregion
     }
 }

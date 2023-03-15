@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using MediatR;
 using Services.Product;
+using Services.File;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +14,7 @@ builder.Services.AddDbContext<ApplicationDbContext>
 builder.Services.AddScoped<IUnitOfWork>(serviceProvider => serviceProvider.GetRequiredService<ApplicationDbContext>());
 builder.Services.AddControllers();
 builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IFileService, FileService>();
 var assembly = AppDomain.CurrentDomain.Load("Application");
 builder.Services.AddMediatR(assembly);
 

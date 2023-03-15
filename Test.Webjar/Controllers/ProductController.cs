@@ -4,7 +4,6 @@ using Application.Product.Query.GetProductAdditive;
 using Application.Product.Query.GetProductCategory;
 using Appliction.Product.Shared.Model.ProductAdditive;
 using MediatR;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Services;
 using Services.Product.Shared.ProductAdditive.Vm;

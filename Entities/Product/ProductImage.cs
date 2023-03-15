@@ -13,6 +13,11 @@ namespace Entities.Product
         public string Path { get; private set; }
         public int ProductId { get; private set; }
         public Product Product { get; private set; }
+
+        public ProductImage(string path)
+        {
+            Path = path;
+        }
     }
 
     internal class ProductImageConfiguration : IEntityTypeConfiguration<ProductImage>

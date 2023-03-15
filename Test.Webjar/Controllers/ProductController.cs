@@ -1,4 +1,5 @@
-﻿using Application.Product.Command.AddProductAdditive;
+﻿using Application.Product.Command.AddProduct;
+using Application.Product.Command.AddProductAdditive;
 using Application.Product.Command.AddProductCategory;
 using Application.Product.Query.GetProductAdditive;
 using Application.Product.Query.GetProductCategory;
@@ -6,6 +7,7 @@ using Appliction.Product.Shared.Model.ProductAdditive;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Services;
+using Services.Product.Shared.Product;
 using Services.Product.Shared.ProductAdditive.Vm;
 using Services.Product.Shared.ProductCategory;
 
@@ -26,6 +28,12 @@ namespace Test.Webjar.Controllers
         public async Task<object> GetProducts()
         {
             return new object();
+        }
+        [HttpPost("[action]")]
+        public async Task<ServiceResult> AddProduct([FromForm] ProductModel model)
+        {
+            var result = await _mediator.Send(new AddProductCommand(model));
+            return result;
         }
         #endregion
 

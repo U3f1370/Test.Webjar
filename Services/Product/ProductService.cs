@@ -2,8 +2,12 @@
 using Entities.Product;
 using Infrastructure.Persistence.Contracts;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Services.File;
+using Services.Product.Shared.Product;
 using Services.Product.Shared.ProductAdditive.Vm;
 using Services.Product.Shared.ProductCategory;
+using System.Reflection.Metadata.Ecma335;
 using Volo.Abp.DependencyInjection;
 
 namespace Services.Product
@@ -12,15 +16,46 @@ namespace Services.Product
     public class ProductService : IProductService, IScopedDependency
     {
         private readonly IUnitOfWork _uow;
+        private readonly IConfiguration _configuration;
+        private readonly IFileService _fileService;
+        private readonly DbSet<Entities.Product.Product> _product;
         private readonly DbSet<ProductCategory> _productCategory;
         private readonly DbSet<ProductAdditive> _productAdditive;
 
-        public ProductService(IUnitOfWork unitOfWork)
+        public ProductService(IUnitOfWork unitOfWork, IConfiguration configuration, IFileService fileService)
         {
             _uow = unitOfWork;
+            _product = _uow.Set<Entities.Product.Product>();
             _productCategory = _uow.Set<ProductCategory>();
             _productAdditive = _uow.Set<ProductAdditive>();
+            _configuration = configuration;
+            _fileService = fileService;
         }
+        #region Product
+        public async Task<ServiceResult> CreateProduct(ProductModel model, CancellationToken cancellationToken)
+        {
+            var existCategory = await _productCategory.FirstOrDefaultAsync(c => c.Id.Equals(model.CategoryId));
+            if (existCategory == null)
+                return new ServiceResult(true, ApiResultStatusCode.BadRequest, "This Category is not exist");
+
+            var existProduct = await _product.FirstOrDefaultAsync(p => p.Title == model.Title.Trim() && p.ProductCategoryId.Equals(model.CategoryId));
+            if (existProduct is not null)
+                return new ServiceResult(true, ApiResultStatusCode.BadRequest, "This Product has already been created");
+
+            var product = new Entities.Product.Product(model.Title.Trim(),model.CategoryId);
+            var pathImage = _configuration["SiteSettings:PathProductImage"];
+            var resultFile = await _fileService.AddFile(model.Image, pathImage);
+            var image = new ProductImage(resultFile.Data);
+            product.Images = new List<ProductImage>() { image };
+
+            await _product.AddAsync(product);
+            var result = await _uow.SaveChangesAsync();
+            if (result > 0)
+                return new ServiceResult(true, ApiResultStatusCode.Success);
+
+            return new ServiceResult(true, ApiResultStatusCode.ServerError);
+        }
+        #endregion
 
         #region Category
         public async Task<ServiceResult> CreateCategory(string Title, CancellationToken cancellationToken)

@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
@@ -14,33 +15,29 @@ namespace Services.File
     public class FileService:IFileService
     {
         private readonly IHostingEnvironment _environment;
-        private readonly ResourceManager _resourceManager;
-        private readonly IConfiguration _configuration;
 
-        public FileService(IHostingEnvironment environment, ResourceManager resourceManager, IConfiguration configuration)
+        public FileService(IHostingEnvironment environment)
         {
             _environment = environment;
-            _resourceManager = resourceManager;
-            _configuration = configuration;
         }
-        public async Task<ServiceResult<string>> AddFile(Stream file)
+       
+
+        public async Task<ServiceResult<string>> AddFile(IFormFile file, string path)
         {
-            var filename = $"{Guid.NewGuid()}.jpg";
-            var midPath = Path.Combine(_configuration["SiteSettings:PathFile"], filename);
-            var relatedPath = Path.Combine(_environment.ContentRootPath, "wwwroot", _configuration["SiteSettings:PathFile"]);
-
-            if (!Directory.Exists(relatedPath))
-                Directory.CreateDirectory(relatedPath);
-
-            var fullPath = Path.Combine(_environment.ContentRootPath, "wwwroot", midPath);
-
-            using (var outputFileStream = new FileStream(fullPath, FileMode.Create))
+            var wwwrootPath = _environment.ContentRootPath + "\\wwwroot";
+            var fileName = $"{Guid.NewGuid()}.jpg";
+            var pname = path +"\\"+ fileName;
+            var saveToPath = Path.Combine(wwwrootPath, path);
+            if (!Directory.Exists(saveToPath))
             {
-                await file.CopyToAsync(outputFileStream);
+                Directory.CreateDirectory(saveToPath);
             }
+            var fileAddress = Path.Combine(wwwrootPath, path, fileName);
 
-            return midPath;
+            using var stream = new FileStream(fileAddress, FileMode.Create);
+            await file.CopyToAsync(stream);
 
+            return fileName;
         }
 
 

@@ -8,9 +8,15 @@ namespace Entities.Product
         public string Title { get;private set; }
         public int ProductCategoryId { get; private set; }
         public ProductCategory ProductCategory { get; private set; }
-        public ICollection<ProductImage> Images { get; private set; }
+        public ICollection<ProductImage> Images { get; set; }
         public ICollection<ProductPriceHistory> ProductPriceHistories { get; private set; }
         public ICollection<ProductToProductAdditive> ProductToProductAdditive { get; private set; }
+
+        public Product(string title, int productCategoryId)
+        {
+            Title = title;
+            ProductCategoryId = productCategoryId;
+        }
 
     }
     internal class ProductConfiguration : IEntityTypeConfiguration<Product>

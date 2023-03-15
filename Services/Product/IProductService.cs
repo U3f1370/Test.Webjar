@@ -28,5 +28,8 @@ namespace Services.Product
         #region ProductPriceOptionValue
         Task<ServiceResult> CreatePriceOptionValue(PriceOptionValueModel model, CancellationToken cancellationToken);
         #endregion
+
+        #region ProductPriceHistory
+        #endregion
     }
 }

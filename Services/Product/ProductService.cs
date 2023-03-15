@@ -47,7 +47,7 @@ namespace Services.Product
             if (existProduct is not null)
                 return new ServiceResult(true, ApiResultStatusCode.BadRequest, "This Product has already been created");
 
-            var product = new Entities.Product.Product(model.Title.Trim(),model.CategoryId);
+            var product = new Entities.Product.Product(model.Title.Trim(), model.CategoryId);
             var pathImage = _configuration["SiteSettings:PathProductImage"];
             var resultFile = await _fileService.AddFile(model.Image, pathImage);
             var image = new ProductImage(resultFile.Data);
@@ -72,30 +72,30 @@ namespace Services.Product
             var category = new ProductCategory(Title);
             await _productCategory.AddAsync(category);
             var result = await _uow.SaveChangesAsync();
-            if(result>0)
+            if (result > 0)
                 return new ServiceResult(true, ApiResultStatusCode.Success);
 
-            return new ServiceResult(true,ApiResultStatusCode.ServerError);
+            return new ServiceResult(true, ApiResultStatusCode.ServerError);
         }
 
         public async Task<ServiceResult<List<ProductCategoryVm>>> GetProductCategory(string? filter, CancellationToken cancellationToken)
         {
             var categorys = await _productCategory
-                .Where(c => !string.IsNullOrEmpty(filter)?c.Title.Contains(filter):true)
-                .Select(c=> new ProductCategoryVm
+                .Where(c => !string.IsNullOrEmpty(filter) ? c.Title.Contains(filter) : true)
+                .Select(c => new ProductCategoryVm
                 {
-                    Id =c.Id,
+                    Id = c.Id,
                     Title = c.Title,
                     CreatedDm = c.CreateDm,
                     LastUpdatedDm = c.LastUpdateDm
                 })
                 .ToListAsync();
-            return new ServiceResult<List<ProductCategoryVm>>(true,ApiResultStatusCode.Success,categorys);
+            return new ServiceResult<List<ProductCategoryVm>>(true, ApiResultStatusCode.Success, categorys);
         }
         #endregion
 
         #region ProductAdditive
-        public async Task<ServiceResult> CreateProductAdditive(int categoryId,string title,decimal price, CancellationToken cancellationToken)
+        public async Task<ServiceResult> CreateProductAdditive(int categoryId, string title, decimal price, CancellationToken cancellationToken)
         {
             var existCategory = await _productCategory.FirstOrDefaultAsync(c => c.Id.Equals(categoryId));
             if (existCategory == null)
@@ -116,14 +116,14 @@ namespace Services.Product
             return new ServiceResult(true, ApiResultStatusCode.ServerError);
         }
 
-        public async Task<ServiceResult<List<ProductAddivesVm>>> GetProductAdditive(string? title, string? catTitle,CancellationToken cancellationToken)
+        public async Task<ServiceResult<List<ProductAddivesVm>>> GetProductAdditive(string? title, string? catTitle, CancellationToken cancellationToken)
         {
             var query = _productAdditive
                 .Include(a => a.ProductCategory)
                 .AsQueryable();
             if (catTitle is not null)
                 query = query.Where(a => a.ProductCategory.Title.Contains(catTitle));
-            if(title is not null)
+            if (title is not null)
                 query = query.Where(a => a.Title.Contains(title));
 
             var additives = await query
@@ -135,12 +135,12 @@ namespace Services.Product
                     CreateDm = a.CreateDm,
                     LateUpdateDm = a.LastUpdateDm,
                 }).ToListAsync();
-            return new ServiceResult<List<ProductAddivesVm>>(true,ApiResultStatusCode.Success,additives);
+            return new ServiceResult<List<ProductAddivesVm>>(true, ApiResultStatusCode.Success, additives);
         }
         #endregion
 
         #region ProductPriceOption
-        public async Task<ServiceResult> CreateProductPriceOption(PriceOptionModel model,CancellationToken cancellationToken)
+        public async Task<ServiceResult> CreateProductPriceOption(PriceOptionModel model, CancellationToken cancellationToken)
         {
             var existCategory = await _productCategory.FirstOrDefaultAsync(c => c.Id.Equals(model.CatId));
             if (existCategory == null)
@@ -165,7 +165,7 @@ namespace Services.Product
         #endregion
 
         #region ProductPriceOptionValue
-        public async Task<ServiceResult> CreatePriceOptionValue(PriceOptionValueModel model,CancellationToken cancellationToken)
+        public async Task<ServiceResult> CreatePriceOptionValue(PriceOptionValueModel model, CancellationToken cancellationToken)
         {
             // we should check option Id is Exists.Also we must check value so that it is not repeated
             var value = new ProductPriceOptionValue(model.Value, model.PriceOptionId);

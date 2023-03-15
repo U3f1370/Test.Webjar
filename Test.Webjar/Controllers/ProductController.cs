@@ -27,11 +27,6 @@ namespace Test.Webjar.Controllers
             _mediator = mediator;
         }
         #region Product
-        [HttpGet("[action]")]
-        public async Task<object> GetProducts()
-        {
-            return new object();
-        }
         [HttpPost("[action]")]
         public async Task<ServiceResult> AddProduct([FromForm] ProductModel model)
         {

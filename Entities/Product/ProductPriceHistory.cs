@@ -16,7 +16,7 @@ namespace Entities.Product
         public DateTime? DiscountPriceExpireAt { get; private set; }
         public int ProductId { get; private set; }
         public Product Product { get; private set; }
-        public ICollection<ProductPriceHistoryToOptionValues> ProductPriceHistoryToOptionValues { get; set; }
+        public ICollection<ProductPriceOptionValue> ProductPriceOptionValues { get; set; }
 
         public ProductPriceHistory(decimal price, int inventory, decimal? discountPrice, DateTime? discountPriceExpireAt, int productId)
         {
@@ -32,7 +32,6 @@ namespace Entities.Product
         public void Configure(EntityTypeBuilder<ProductPriceHistory> builder)
         {
             builder.ToTable(nameof(ProductPriceHistory), nameof(SchemaEnum.product));
-            builder.HasMany(p => p.ProductPriceHistoryToOptionValues).WithOne(p => p.ProductPriceHistory).HasForeignKey(p=>p.ProductPriceHistoryId);
         }
     }
 }

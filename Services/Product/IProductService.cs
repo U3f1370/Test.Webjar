@@ -9,6 +9,8 @@ namespace Services.Product
     public interface IProductService
     {
         #region Product
+        Task<ServiceResult<List<ProductVm>>> GetProduct(string? productTitle,
+            string? CategoryTitle, CancellationToken cancellationToken);
         Task<ServiceResult> CreateProduct(ProductModel model, CancellationToken cancellationToken);
         #endregion
 

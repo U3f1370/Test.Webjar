@@ -4,11 +4,13 @@ using Application.Product.Command.AddProductAdditive;
 using Application.Product.Command.AddProductCategory;
 using Application.Product.Command.AddProductPrice;
 using Application.Product.Command.AddProductPriceOption;
+using Application.Product.Query.GetProduct;
 using Application.Product.Query.GetProductAdditive;
 using Application.Product.Query.GetProductCategory;
 using Appliction.Product.Shared.Model.ProductAdditive;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Services;
 using Services.Product.Shared.Product;
 using Services.Product.Shared.ProductAdditive.Vm;
@@ -28,7 +30,51 @@ namespace Test.Webjar.Controllers
         {
             _mediator = mediator;
         }
+        //public IActionResult GetProduct2(string productName, List<string> optionValueNames)
+        //{
+        //    var query = _context.Product
+        //        .Include(p => p.PriceHistories)
+        //        .ThenInclude(ph => ph.OptionValue)
+        //        .ThenInclude(ov => ov.Option)
+        //        .AsQueryable();
+
+        //    // apply filters
+        //    if (!string.IsNullOrEmpty(productName))
+        //    {
+        //        query = query.Where(p => p.Name.Contains(productName));
+        //    }
+
+        //    if (optionValueNames != null && optionValueNames.Any())
+        //    {
+        //        query = query.Where(p =>
+        //            p.OptionValues.Any(ov => optionValueNames.Contains(ov.Value))
+        //            && p.OptionValues.Count() == optionValueNames.Count
+        //        );
+        //    }
+
+        //    var result = query.Select(p => new
+        //    {
+        //        ProductName = p.Name,
+        //        OptionValues = p.OptionValues.Select(ov => new
+        //        {
+        //            OptionName = ov.Option.Name,
+        //            Value = ov.Value
+        //        }).ToList(),
+        //        Price = p.PriceHistories.OrderByDescending(ph => ph.CreatedAt).FirstOrDefault().Price,
+        //        Inventory = p.PriceHistories.OrderByDescending(ph => ph.CreatedAt).FirstOrDefault().Inventory,
+        //        Discount = p.PriceHistories.OrderByDescending(ph => ph.CreatedAt).FirstOrDefault().Discount
+        //    }).ToList();
+
+        //    return Ok(result);
+        //}
         #region Product
+        [HttpGet("[action]")]
+        public async Task<ServiceResult> GetProduct(string? productTitle, string? catgoryTitle)
+        {
+            var result = await _mediator.Send(new GetProductQuery(productTitle, catgoryTitle));
+            return result;
+        }
+
         [HttpPost("[action]")]
         public async Task<ServiceResult> AddProduct([FromForm] ProductModel model)
         {

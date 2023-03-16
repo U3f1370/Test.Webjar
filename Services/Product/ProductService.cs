@@ -40,6 +40,59 @@ namespace Services.Product
             _fileService = fileService;
         }
         #region Product
+        public async Task<ServiceResult<List<ProductVm>>> GetProduct(string? productTitle,
+            string? CategoryTitle, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var query = _product
+                    .Include(p => p.ProductCategory)
+                    .Include(p => p.ProductPriceHistories)
+                    .ThenInclude(p => p.ProductPriceOptionValues)
+                    .ThenInclude(p => p.ProductPriceOption)
+                    .Include(p => p.ProductToProductAdditive)
+                    .ThenInclude(p => p.ProductAdditive)
+                    .AsQueryable();
+
+                if (productTitle is not null)
+                    query = query.Where(p => p.Title.Contains(productTitle));
+
+                if (CategoryTitle is not null)
+                    query = query.Where(p => p.ProductCategory.Title.Contains(CategoryTitle));
+
+
+                var Products = await query.Select(p => new ProductVm
+                {
+                    ProductTitle = p.Title,
+                    ProductCategoryTitle = p.ProductCategory.Title,
+                    prices = p.ProductPriceHistories.Any() ? p.ProductPriceHistories.Select(x => new Prices
+                    {
+                        Price = x.Price,
+                        Inventory = x.Inventory,
+                        DiscountPrice = x.DiscountPrice,
+                        DiscountPriceExpireAt = x.DiscountPriceExpireAt,
+                        Features = x.ProductPriceOptionValues.Select(h=>new Features
+                        {
+                            OptionTitle = h.ProductPriceOption.Name,
+                            OptionValueTitle = h.Value
+                        }).ToList()
+                    }).ToList():default,
+                    Additives = p.ProductToProductAdditive.Any() ? p.ProductToProductAdditive.Select(a => new Additives
+                    {
+                        Title = a.ProductAdditive.Title,
+                        Price = a.ProductAdditive.Price,
+                    }).ToList() : default,
+
+                }).ToListAsync();
+
+
+                return new ServiceResult<List<ProductVm>>(true, ApiResultStatusCode.Success, Products);
+            }
+            catch (Exception ex)
+            {
+                return new ServiceResult<List<ProductVm>>(false, ApiResultStatusCode.ServerError, null, ex.Message);
+            }
+        }
         public async Task<ServiceResult> CreateProduct(ProductModel model, CancellationToken cancellationToken)
         {
             var existCategory = await _productCategory.FirstOrDefaultAsync(c => c.Id.Equals(model.CategoryId));
@@ -183,20 +236,21 @@ namespace Services.Product
         #endregion
 
         #region ProductPrice
-        public async Task<ServiceResult> CreateProductPrice(ProductPriceModel model,CancellationToken cancellationToken)
+        public async Task<ServiceResult> CreateProductPrice(ProductPriceModel model, CancellationToken cancellationToken)
         {
             var productPrice = new ProductPriceHistory(model.Price, model.Inventory,
                 model.DiscountPrice, model.DiscountPriceExpireAt, model.ProductId);
 
-            if (model.OptionValues != null && model.OptionValues.Any())
+            if (model.OptionValuesIds != null && model.OptionValuesIds.Any())
             {
-                var priceToValues = new List<ProductPriceHistoryToOptionValues>();
-                
-                foreach(var optionValue in model.OptionValues)
-                {
-                    priceToValues.Add(new ProductPriceHistoryToOptionValues(optionValue.OptionValueId));
-                }
-                productPrice.ProductPriceHistoryToOptionValues = priceToValues;
+                //productPrice.ProductPriceOptionValues = new List<ProductPriceOptionValue>();
+                var values = await _optionValues.Where(p => model.OptionValuesIds.Contains(p.Id)).ToListAsync();
+                productPrice.ProductPriceOptionValues = values;
+                //foreach (var item in model.OptionValuesIds)
+                //{
+                //    var option = await _optionValues.FindAsync(item).ConfigureAwait(false);
+                //    productPrice.ProductPriceOptionValues.Add(option);
+                //}
             }
 
             await _productPriceHistories.AddAsync(productPrice);

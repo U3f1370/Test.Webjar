@@ -1,5 +1,6 @@
 ﻿using Common.Utilities;
 using Entities;
+using Entities.Product;
 using Infrastructure.Persistence.Contracts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -47,6 +48,9 @@ namespace Infrastructure.Persistence
             modelBuilder.AddRestrictDeleteBehaviorConvention();
             modelBuilder.AddSequentialGuidForIdConvention();
             modelBuilder.AddPluralizingTableNameConvention();
+
+            modelBuilder.Entity<ProductPriceHistory>().HasMany(x => x.ProductPriceOptionValues)
+                .WithMany(x => x.ProductPriceHistories).UsingEntity(x => x.ToTable("ProductPriceHistoryToOptionValues"));
         }
 
         public void BeginTransaction()

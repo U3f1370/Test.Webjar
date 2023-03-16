@@ -17,11 +17,6 @@ namespace Services.Product.Shared.ProductPrice
         public int Inventory { get; set; }
         public decimal? DiscountPrice { get; set; }
         public DateTime? DiscountPriceExpireAt { get; set;}
-        public List<OptionValues>? OptionValues { get; set; }
-    }
-
-    public class OptionValues
-    {
-        public int OptionValueId { get; set; }
+        public int[] OptionValuesIds { get; set; }
     }
 }
